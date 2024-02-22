@@ -27,7 +27,7 @@ Whilst I believe the criteria for the task has been met, given the timeframe in 
 - UI / UX
   - A map / search could be implemented to set the lat/long values for the user (much like the linked site in the application).
   - The crime category summaries could use a more human-readable name. It's possible to retrieve this using the API, or they have also provided a static list of mappings which we could use in our application.
-  - Validation could be implemented to ensure only a UK lat/long and a valid date is selected. This could be done both client and server side. Although validation is not currently implemented, the application will still fail gracefully and catch and exceptions from the police API and display an error to the user.
+  - Validation could be implemented to ensure only a UK lat/long and a valid date is selected. This could be done both client and server side. Although validation is not currently implemented, the application will still fail gracefully and catch any exceptions and display an error to the user.
 - UKCrimeClientTests
   - I didn't get round to implementing the tests for the client service (the class calling the police API). It may need a slight refactoring so it's not as dependent on the HttpClient class.
 - Home controller logic
