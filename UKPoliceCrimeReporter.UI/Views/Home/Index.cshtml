@@ -1,0 +1,103 @@
+﻿@model CrimeDataViewModel
+@using UKPoliceCrimeReporter.UI.Enums
+
+@{
+    ViewData["Title"] = "Home Page";
+
+    //anything below 2021 causes the API to 404, but can't find this documented anywhere - TODO: config source this with more time so it's not hard coded
+    int minYear = 2021;
+    int maxYear = Model.MaxAllowedDate?.Year ?? DateTime.Now.Year; //fall back to now so we can at least always have a max year
+
+    //TODO: right now there not any logic to ensure there is a maximum month for the maximum year
+    //E.g., if the max date was 2024-04, and someone selected the year 2024, they could still choose a month higher than April
+
+    //build up select list items for the year
+    List<SelectListItem> yearSelectItems = new List<SelectListItem>();
+
+    @for (int i = maxYear; i >= minYear; i--)
+    {
+        string yearString = i.ToString();
+        yearSelectItems.Add(
+            new SelectListItem(yearString, yearString)
+        );
+    }
+}
+
+<div class="row g-5">
+    <div class="col-12 col-md-3">
+
+
+        <form>
+            <div class="row g-3">
+                <div class="col-12">
+                    @Html.LabelFor(model => model.Latitude)
+                    @Html.TextBox("lat", Model.Latitude, new { type = "number", step = "any", @class = "form-control" })
+
+                </div>
+                <div class="col-12">
+                    @Html.LabelFor(model => model.Longitude)
+                    @Html.TextBox("lng", Model.Longitude, new { type = "number", step = "any", @class = "form-control" })
+                </div>
+
+                @* No time to implement anything fancy for a lat/long picker, so just link out to one *@
+                @* with more time, this application would just replicate what the linked site does so the user doesn't have to manually enter lat/long values *@
+                <div class="col-12">
+                    <a href="https://www.latlong.net/" target="_blank">Find latitude and longitude</a>
+                </div>
+                <div class="col-12">
+                    <label for="month">Month</label>
+                    @Html.DropDownList("month",
+                                  Html.GetEnumSelectList<Month>(),
+                                  new { @class = "form-select", @value = Model.Month })
+                </div>
+                <div class="col-12">
+                    <label for="year">Year</label>
+                    @Html.DropDownList("year",
+                                yearSelectItems,
+                                new { @class = "form-select", @value = Model.Year })
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="col-12 col-md-9">
+
+
+        @if (Model.ShowResults)
+        {
+
+            @if (Model.LookupFailed)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <span>An error occurred</span>
+                </div>
+            }
+            else if (Model.CategoryGroupedCrimes == null)
+            {
+                <div class="alert alert-warning" role="alert">
+                    <span>No results found</span>
+                </div>
+            }
+            else
+            {
+                <h3>Crime summary</h3>
+
+                <div>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var crime in Model.CategoryGroupedCrimes)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @crime.Key
+                                <span class="badge bg-primary rounded-pill">@crime.Value.Count @string.Format("crime{0}", crime.Value.Count > 1 ? "s" : "")</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+    </div>
+</div>
